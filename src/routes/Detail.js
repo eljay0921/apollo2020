@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { gql } from "apollo-boost";
 import { useQuery } from "@apollo/react-hooks";
 import styled from "styled-components";
@@ -15,14 +15,23 @@ const GET_MOVIE = gql`
       genres
       description_intro
     }
+
+    suggestions(id: $id) {
+      id
+      title
+      medium_cover_image
+    }
   }
 `;
 
 //#region styles
 
+const BackGround = styled.div`
+  background-image: linear-gradient(-45deg, #d754ab, #fd723a);
+`;
+
 const Container = styled.div`
   height: 100vh;
-  background-image: linear-gradient(-45deg, #d754ab, #fd723a);
   width: 100%;
   display: flex;
   justify-content: space-around;
@@ -37,7 +46,7 @@ const Column = styled.div`
 
 const Title = styled.h1`
   font-size: 65px;
-  margin-bottom: 15px;
+  margin: 2% 0 5%;
 `;
 
 const Subtitle = styled.h4`
@@ -47,6 +56,7 @@ const Subtitle = styled.h4`
 
 const Description = styled.p`
   font-size: 28px;
+  margin-bottom: 5%;
 `;
 
 const Poster = styled.div`
@@ -58,6 +68,46 @@ const Poster = styled.div`
   background-position: center center;
 `;
 
+const ContainerSuggestion = styled.div`
+  width: 100%
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+`;
+
+const Suggestion = styled.label`
+  margin-right: 1.5vw;
+  font-style: italic;
+  text-decoration: underline;
+`;
+
+const GoHomeLink = styled(Link)`
+  width: 100%;
+  color: white;
+  text-decoration: none;
+  position: relative;
+  top: -30px;
+
+  &:focus,
+  &:hover,
+  &:visited,
+  &:link,
+  &:active {
+    text-decoration: none;
+  }
+`;
+
+const StyledLink = styled(Link)`
+  color: white;
+  text-decoration: none;
+
+  &:focus,
+  &:hover,
+  &:visited,
+  &:link,
+  &:active {
+    text-decoration: none;
+  }
+`;
 //#endregion
 
 export default () => {
@@ -66,19 +116,27 @@ export default () => {
     variables: { id: parseInt(id) },
   });
   return (
-    <Container>
-      <Column>
-        <Title>
-          {loading
-            ? "Loading..."
-            : `${data.movie.title} ${data.movie.isLiked ? "💖" : "😞"}`}
-        </Title>
-        <Subtitle>
-          {data?.movie?.language} · {data?.movie?.rating}
-        </Subtitle>
-        <Description>{data?.movie?.description_intro}</Description>
-      </Column>
-      <Poster bg={data?.movie?.medium_cover_image}></Poster>
-    </Container>
+    <>
+      <BackGround>
+        <Container>
+          <Column>
+            <GoHomeLink to="/">{data ? "> Home" : ""}</GoHomeLink>
+            <Title>{loading ? "Loading..." : `${data.movie.title}`}</Title>
+            <Subtitle>
+              {data?.movie?.language} · {data?.movie?.rating}
+            </Subtitle>
+            <Description>{data?.movie?.description_intro}</Description>
+            <ContainerSuggestion>
+              {data?.suggestions?.map((item) => (
+                <StyledLink to={`/${item.id}`}>
+                  <Suggestion>{item.title}</Suggestion>
+                </StyledLink>
+              ))}
+            </ContainerSuggestion>
+          </Column>
+          <Poster bg={data?.movie?.medium_cover_image}></Poster>
+        </Container>
+      </BackGround>
+    </>
   );
 };

@@ -61,7 +61,7 @@ const GET_MOVIES = gql`
 `;
 
 export default () => {
-  const { loading, error, data } = useQuery(GET_MOVIES);
+  const { loading, data } = useQuery(GET_MOVIES);
 
   return (
     <Container>
@@ -69,20 +69,17 @@ export default () => {
         <Title>Apollo 2020</Title>
         <SubTitle>I Love Graphql</SubTitle>
       </Header>
-      {loading && <Loading>Loading...</Loading>}
-      {!loading &&
-        data &&
-        data.movies.map((item) => <Movie key={item.id} id={item.id} />)}
+      <Movies>
+        {loading && <Loading>Loading...</Loading>}
+        {data?.movies?.map((item) => (
+          <Movie
+            key={item.id}
+            id={item.id}
+            // isLiked={item.isLiked}
+            bg={item.medium_cover_image}
+          />
+        ))}
+      </Movies>
     </Container>
   );
-
-  if (loading) {
-    return "loading...";
-  }
-
-  if (data && data.movies) {
-    return data.movies.map((movie) => <h1 key={movie.id}>{movie.id}</h1>);
-  }
-
-  return <h1>Home</h1>;
 };

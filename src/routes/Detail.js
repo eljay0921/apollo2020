@@ -9,11 +9,13 @@ const GET_MOVIE = gql`
   query getMovie($id: Int!) {
     # query to server
     movie(id: $id) {
+      id
       title
       medium_cover_image
       language
       genres
       description_intro
+      isLiked @client
     }
 
     suggestions(id: $id) {
@@ -121,7 +123,11 @@ export default () => {
         <Container>
           <Column>
             <GoHomeLink to="/">{data ? "> Home" : ""}</GoHomeLink>
-            <Title>{loading ? "Loading..." : `${data.movie.title}`}</Title>
+            <Title>
+              {loading
+                ? "Loading..."
+                : `${data.movie.isLiked ? "💚" : "🧐"} ${data.movie.title}`}
+            </Title>
             <Subtitle>
               {data?.movie?.language} · {data?.movie?.rating}
             </Subtitle>
